@@ -12,11 +12,11 @@ export default function Footer() {
       }}
     >
       <p style={{ margin: '5px 0', color: '#666' }}>
-        &copy; 2025 | e2517dev@gmail.com. All Rights Reserved.
+        &copy; 2025 | e2517dev@gmail.com. All rights reserved.
       </p>
       <p style={{ margin: '5px 0' }}>
         <Link href="/legal#aviso-legal" style={{ color: 'var(--secondary-color)', textDecoration: 'none', margin: '0 15px' }}>
-          All rights reserved.
+          Legal
         </Link>
         <Link href="/legal#condiciones-contratacion" style={{ color: 'var(--secondary-color)', textDecoration: 'none', margin: '0 15px' }}>
           Terms of Use
