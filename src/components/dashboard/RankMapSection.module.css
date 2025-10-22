@@ -1,0 +1,209 @@
+.card {
+    background: #ffffff;
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1.5rem;
+    border: 1px solid #e5e7eb;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.formGroup {
+    margin-bottom: 1.25rem;
+}
+
+.formGroup label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #374151;
+}
+
+.input,
+.select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    background-color: #ffffff;
+    color: #374151;
+    font-size: 1rem;
+}
+
+.distanceFilter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: center;
+    margin-top: 0.5rem;
+}
+
+.distanceFilter label {
+    margin-right: 8px;
+    font-weight: 500;
+    color: #374151;
+}
+
+.distanceFilter input[type="checkbox"] {
+    accent-color: #6c4ab6;
+    transform: scale(1.2);
+}
+
+.distanceFilter select {
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    background-color: #ffffff;
+    color: #374151;
+    font-size: 0.875rem;
+    min-width: 150px;
+}
+
+.button {
+    padding: 10px 15px;
+    margin-top: 1em;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-size: 1rem;
+    background: linear-gradient(to right, #d64a6c, #c53a5d);
+    color: #fff;
+}
+
+.button:hover {
+    background: linear-gradient(to right, #c53a5d, #b92530);
+}
+
+.message {
+    margin-top: 15px;
+    color: #dc3545;
+}
+
+#rankmapContainer {
+    height: 400px;
+    width: 100%;
+    margin-top: 20px;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    display: none;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+#rankmapPlaceholder {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f8f9fa;
+    font-size: 1.2rem;
+    color: #6b7280;
+}
+
+.statsContainer {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+    padding: 1.5rem;
+    background-color: #f8f9fa;
+    border-radius: 0.75rem;
+    border: 1px solid #e5e7eb;
+}
+
+.statBox {
+    padding: 1.25rem;
+    background-color: #ffffff;
+    border-radius: 0.5rem;
+    text-align: center;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.statValue {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #6c4ab6;
+}
+
+.statLabel {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-top: 0.25rem;
+    font-weight: 500;
+}
+
+.comparisonValue {
+    font-weight: bold;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    display: inline-block;
+    min-width: 50px;
+    text-align: center;
+}
+
+.comparisonValue.better {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.comparisonValue.worse {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.comparisonBox {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.comparisonItem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+}
+
+.limit-error {
+    background: #fff9db;
+    border: 1px solid #ffd43b;
+    border-radius: 8px;
+    padding: 16px;
+    margin: 16px 0;
+    color: #856404;
+    font-size: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.limit-error strong {
+    font-weight: 600;
+}
+
+.limit-error a,
+.limit-error button {
+    display: inline-block;
+    background: #0070f3;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 500;
+    width: fit-content;
+    margin-top: 4px;
+}
+
+.limit-error a:hover,
+.limit-error button:hover {
+    background: #005fcc;
+}
+
+.errorMessage {
+    color: #d32f2f;
+    font-size: 16px;
+    margin-top: 8px;
+    text-align: left;
+}

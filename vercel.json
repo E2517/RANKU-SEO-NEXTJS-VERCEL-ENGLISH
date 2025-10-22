@@ -1,0 +1,12 @@
+{
+    "crons": [
+        {
+            "path": "/api/reset-keyword-limits",
+            "schedule": "0 0 * * *"
+        },
+        {
+            "path": "/api/admin/update-all-keywords",
+            "schedule": "0 3 * * *"
+        }
+    ]
+}

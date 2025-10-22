@@ -1,0 +1,229 @@
+.profileCard {
+    background-color: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid #e5e7eb;
+}
+
+.profileCard h4 {
+    font-size: 1.2rem;
+    color: #6c4ab6;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.profileCard p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 1rem;
+}
+
+.subscriptionCard {
+    background-color: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid #e5e7eb;
+}
+
+.subscriptionCard h4 {
+    font-size: 1.2rem;
+    color: #6c4ab6;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.subscriptionCard p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 1rem;
+}
+
+.usageInfo {
+    margin-top: 1rem;
+    font-size: 1rem;
+    color: #6b7280;
+}
+
+.subscriptionPlans {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.planCard {
+    background: #ffffff;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    text-align: center;
+    border: 1px solid #e5e7eb;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.planCard::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(to right, #6c4ab6, #d64a6c);
+}
+
+.planCard:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.planCard h3 {
+    color: #374151;
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+.planPrice {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #6c4ab6;
+    margin-bottom: 1rem;
+}
+
+.planPrice .currency,
+.planPrice .period {
+    font-size: 1rem;
+    font-weight: normal;
+}
+
+.planCard ul {
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0;
+    text-align: left;
+    color: #6b7280;
+}
+
+.planCard li {
+    margin-bottom: 10px;
+    position: relative;
+    padding-left: 28px;
+    display: flex;
+    align-items: center;
+}
+
+.planCard li::before {
+    content: '✓';
+    color: #6c4ab6;
+    position: absolute;
+    left: 0;
+    font-weight: bold;
+    background: #f3f4f6;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+}
+
+.planCard li.unsupported::before {
+    content: '✕';
+    color: #dc3545;
+    background: #f3f4f6;
+}
+
+.planCard li.googleLocal {
+    color: #00bcd4;
+    font-weight: bold;
+}
+
+.checkoutButton {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(to right, #6c4ab6, #d64a6c);
+    color: #fff;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.checkoutButton:hover {
+    background: linear-gradient(to right, #5a3b9d, #c53a5d);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    transform: translateY(-1px);
+}
+
+.creditsButton {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(to right, #d64a6c, #c53a5d);
+    color: #fff;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.creditsButton:hover {
+    background: linear-gradient(to right, #c53a5d, #b92530);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    transform: translateY(-1px);
+}
+
+.cancelButton {
+    width: 100%;
+    padding: 12px;
+    background-color: #dc3545;
+    color: #fff;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+    margin-top: 10px;
+    display: none;
+    /* Se puede mostrar condicionalmente si es necesario */
+    font-weight: 600;
+}
+
+.cancelButton:hover {
+    background-color: #c82333;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* ... (el código anterior de ProfileSection.module.css se mantiene igual) ... */
+
+.cancelButton {
+    width: 100%;
+    padding: 12px;
+    background-color: #dc3545;
+    color: #fff;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+    margin-top: 10px;
+    /* Siempre visible si se renderiza */
+    display: block;
+    font-weight: 600;
+}
+
+.cancelButton:hover {
+    background-color: #c82333;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* ... (el resto del código anterior se mantiene igual) ... */
