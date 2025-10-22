@@ -16,13 +16,13 @@ export default function Footer() {
       </p>
       <p style={{ margin: '5px 0' }}>
         <Link href="/legal#aviso-legal" style={{ color: 'var(--secondary-color)', textDecoration: 'none', margin: '0 15px' }}>
-          Aviso Legal
+          All rights reserved.
         </Link>
         <Link href="/legal#condiciones-contratacion" style={{ color: 'var(--secondary-color)', textDecoration: 'none', margin: '0 15px' }}>
-          Condiciones de contratación
+          Terms of Use
         </Link>
         <Link href="/legal#contacto" style={{ color: 'var(--secondary-color)', textDecoration: 'none', margin: '0 15px' }}>
-          Contacto
+          Contact
         </Link>
       </p>
     </footer>
