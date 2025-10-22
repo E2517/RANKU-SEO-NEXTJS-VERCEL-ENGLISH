@@ -12,7 +12,7 @@ export default function Footer() {
       }}
     >
       <p style={{ margin: '5px 0', color: '#666' }}>
-        &copy; 2025 | e2517dev@gmail.com. Todos los derechos reservados.
+        &copy; 2025 | e2517dev@gmail.com. All Rights Reserved.
       </p>
       <p style={{ margin: '5px 0' }}>
         <Link href="/legal#aviso-legal" style={{ color: 'var(--secondary-color)', textDecoration: 'none', margin: '0 15px' }}>
