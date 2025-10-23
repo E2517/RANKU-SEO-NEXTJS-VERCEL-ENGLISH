@@ -288,7 +288,7 @@ export default function ProfileSection() {
                         <li>Daily (24h) and weekly (7-day) updates</li>
                         <li>Competitor analysis</li>
                         <li>✅ RankMap: Google Maps ranking by location</li>
-                        <li>🥷 ScanMap: Domain visibility based on user location (15 searches/month)</li>
+                        <li>🥷 ScanMap: Domain visibility based on user location (10 searches/month)</li>
                         <li>📈 Smart statistics</li>
                         <li>Downloadable Excel report</li>
                         <li>Downloadable SEO PDF report</li>
@@ -307,7 +307,7 @@ export default function ProfileSection() {
                         <li>Daily (24h) and weekly (7-day) updates</li>
                         <li>Competitor analysis</li>
                         <li>✅ RankMap: Google Maps ranking by location</li>
-                        <li>🥷 ScanMap: Domain visibility based on user location (25 searches/month)</li>
+                        <li>🥷 ScanMap: Domain visibility based on user location (15 searches/month)</li>
                         <li>📈 Smart statistics</li>
                         <li>Downloadable Excel report</li>
                         <li>Downloadable SEO PDF report</li>
