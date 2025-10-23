@@ -9,6 +9,7 @@ import SearchForm from '@/components/dashboard/SearchForm';
 import DomainsSection from '@/components/dashboard/DomainsSection';
 import RankMapSection from '@/components/dashboard/RankMapSection';
 import ScanMapSection from '@/components/dashboard/ScanMapSection';
+import AISearchForm from '@/components/dashboard/AISearchForm';
 import KeywordCounter from '@/components/dashboard/KeywordCounter';
 import StatsSection from '@/components/dashboard/StatsSection';
 import ProfileSection from '@/components/dashboard/ProfileSection';
@@ -59,6 +60,8 @@ function DashboardContent() {
                 return <RankMapSection />;
             case 'scanmap-section':
                 return <ScanMapSection />;
+            case 'ai-intelligence-section':
+                return <AISearchForm />;
             case 'keywords-history-section':
                 return <KeywordCounter />;
             case 'stats-section':
@@ -174,6 +177,17 @@ function DashboardContent() {
                                     }}
                                 >
                                     <i className="fas fa-map-marked-alt"></i> ScanMap
+                                </button>
+                            </li>
+                            <li>
+                                <button
+                                    className={`sidebar-link ${activeTab === 'ai-intelligence-section' ? 'active' : ''}`}
+                                    onClick={() => {
+                                        setActiveTab('ai-intelligence-section');
+                                        setIsSidebarOpen(false);
+                                    }}
+                                >
+                                    <i className="fas fa-brain"></i> AI Intelligence
                                 </button>
                             </li>
                             <li>

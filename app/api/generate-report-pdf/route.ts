@@ -15,7 +15,7 @@ function generateSEOExplanation(position: number, keyword: string, domain: strin
     } else if (position <= 10) {
         return `👍 Good visibility. Ranking in the <strong>top 10</strong> for <em>"${keyword}"</em> indicates that the domain <strong>${domain}</strong> is relevant.`;
     } else {
-        return `🔍 The domain <strong>${domain}</strong> appears at position <strong>#${position}</strong> for <em>"${keyword}"</em>. Although indexed, its visibility is limited.`;
+        return `🔍 The domain <strong>${domain}</strong> appears at position <strong>#${position}</strong> for <em>"${keyword}"</em>. While indexed, its visibility is limited.`;
     }
 }
 
@@ -33,7 +33,6 @@ export async function GET(req: NextRequest) {
     try {
         userId = new Types.ObjectId(userIdStr);
     } catch (e) {
-        console.error(e)
         return NextResponse.json({ success: false, message: 'Invalid user ID.' }, { status: 400 });
     }
 
@@ -52,8 +51,6 @@ export async function GET(req: NextRequest) {
         if (keyword) query.palabraClave = keyword;
 
         const allSeoResults = await SearchResult.find(query).sort({ createdAt: -1 }).limit(500);
-        console.log('🔍 allSeoResults count:', allSeoResults.length);
-        console.log('🔍 allSeoResults sample:', allSeoResults.slice(0, 3));
 
         if (allSeoResults.length === 0) {
             return NextResponse.json({ success: false, message: 'No results found.' }, { status: 404 });
@@ -63,8 +60,6 @@ export async function GET(req: NextRequest) {
         if (devices.length > 0) {
             filteredSeoResults = allSeoResults.filter(r => r.dispositivo && devices.includes(r.dispositivo));
         }
-        console.log('📱 filteredSeoResults count:', filteredSeoResults.length);
-        console.log('📱 filteredSeoResults devices:', [...new Set(filteredSeoResults.map(r => r.dispositivo))]);
 
         const deviceOrder: Record<string, number> = { 'desktop': 1, 'mobile': 2, 'google_local': 3 };
         filteredSeoResults.sort((a, b) => {
@@ -85,16 +80,11 @@ export async function GET(req: NextRequest) {
                 uniqueSeoResults.push(r);
             }
         }
-        console.log('✅ uniqueSeoResults count:', uniqueSeoResults.length);
-        console.log('✅ uniqueSeoResults sample:', uniqueSeoResults.slice(0, 3));
 
-        const serpResults = uniqueSeoResults.filter(r => r.dispositivo === 'desktop' || r.dispositivo === 'mobile');
+        const serpResults = uniqueSeoResults.filter(r => (r.dispositivo === 'desktop' || r.dispositivo === 'mobile') && r.buscador !== 'google_ai');
+        const aiResults = uniqueSeoResults.filter(r => r.buscador === 'google_ai');
         const googleLocalResults = uniqueSeoResults.filter(r => r.dispositivo === 'google_local' && r.buscador === 'google_local');
         const rankMapResults = uniqueSeoResults.filter(r => r.buscador === 'google_maps');
-
-        console.log('📊 SERP results:', serpResults.length);
-        console.log('📊 Google Local results:', googleLocalResults.length);
-        console.log('📊 RankMap results:', rankMapResults.length);
 
         let mostRecentGoogleLocal = null;
         if (googleLocalResults.length > 0) {
@@ -111,8 +101,6 @@ export async function GET(req: NextRequest) {
                 scanMapResults = await LocalVisibilityResult.find({ campaignId: latestScanMapCampaign._id });
             }
         }
-        console.log('🗺️ ScanMap campaign found:', !!latestScanMapCampaign);
-        console.log('🗺️ ScanMap results count:', scanMapResults.length);
 
         let businessAddress = '';
         if (mostRecentGoogleLocal) {
@@ -149,6 +137,27 @@ export async function GET(req: NextRequest) {
                 <div style="margin-top: 0.5rem; padding: 0.75rem; background: #eef7ff; border-left: 3px solid #6c4ab6;">
                     <strong>Analysis:</strong><br>
                     ${generateSEOExplanation(bestPos === 'N/A' ? 0 : bestPos, r.palabraClave, r.dominio)}
+                </div>
+            </div>
+            `;
+        }
+
+        let aiHtml = '';
+        for (const r of aiResults) {
+            const positions = [r.posicion].filter(p => p > 0);
+            const avgPos = positions.length > 0 ? (positions.reduce((a, b) => a + b, 0) / positions.length).toFixed(1) : 'N/A';
+            const bestPos = positions.length > 0 ? Math.min(...positions) : 'N/A';
+            aiHtml += `
+            <div style="margin-bottom: 1.5rem; padding: 1rem; background: #f8f9fa; border-radius: 0.5rem;">
+                <h3 style="color: #6c4ab6; margin-bottom: 0.5rem;">Artificial Intelligence — ${r.location || 'Global'}</h3>
+                <p><strong>AI Query:</strong> ${r.palabraClave}</p>
+                <p><strong>Domain:</strong> ${r.dominio}</p>
+                <p><strong>Position:</strong> #${bestPos}</p>
+                <div style="margin-top: 0.5rem; padding: 0.75rem; background: #eef7ff; border-left: 3px solid #6c4ab6;">
+                    <strong>Analysis:</strong><br>
+                    ${bestPos !== 'N/A'
+                    ? `✅ The domain <strong>${r.dominio}</strong> was identified by Google AI at position <strong>#${bestPos}</strong> for the query: <em>"${r.palabraClave}"</em>.`
+                    : `⚠️ The domain <strong>${r.dominio}</strong> was not identified by Google AI in the analyzed results.`}
                 </div>
             </div>
             `;
@@ -194,10 +203,10 @@ export async function GET(req: NextRequest) {
                     <li><strong>Worst position:</strong> #${worst}</li>
                     <li><strong>Appears in:</strong> ${found.length} of ${rankMapResults.length} locations</li>
                 </ul>
-                <p><em>Data from your most recent search in the RankMap section.</em></p>
+                <p><em>Data from your latest search in the RankMap section.</em></p>
                 `;
             } else {
-                rankMapHtml = '<p>⚠️ RankMap results were found, but none include a valid position (>0).</p>';
+                rankMapHtml = '<p>⚠️ RankMap results were found, but none contain a valid position (>0).</p>';
             }
         }
 
@@ -217,10 +226,10 @@ export async function GET(req: NextRequest) {
                     <li><strong>Worst position:</strong> #${worst}</li>
                     <li><strong>Appears in:</strong> ${found.length} of ${scanMapResults.length} locations</li>
                 </ul>
-                <p><em>Data from your most recent search in the ScanMap section.</em></p>
+                <p><em>Data from your latest search in the ScanMap section.</em></p>
                 `;
             } else {
-                scanMapHtml = '<p>⚠️ ScanMap results were found, but none include a valid ranking (>0).</p>';
+                scanMapHtml = '<p>⚠️ ScanMap results were found, but none contain a valid ranking (>0).</p>';
             }
         }
 
@@ -277,6 +286,7 @@ export async function GET(req: NextRequest) {
                 ${serpHtml ? `<h2>🔍 SERP – Google Search</h2>${serpHtml}` : ''}
                 <div class="page-break"></div>
                 ${googleLocalHtml ? `<h2>📍 Google Local</h2>${googleLocalHtml}` : ''}
+                ${aiHtml ? `<h2>🧠 Artificial Intelligence</h2>${aiHtml}` : ''}
                 <h2>🗺️ RankMap – Google Maps</h2>
                 ${rankMapHtml}
                 <h2>🥷 ScanMap – Local Visibility</h2>

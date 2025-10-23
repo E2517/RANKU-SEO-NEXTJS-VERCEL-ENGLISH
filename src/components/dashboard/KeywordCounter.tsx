@@ -26,7 +26,7 @@ export default function KeywordCounter() {
             }
         } catch (err) {
             console.error(err);
-            showToast.error('Network error while loading history.', {
+            showToast.error('Network error loading history.', {
                 duration: 4000,
                 position: 'top-center',
                 transition: 'topBounce',
@@ -81,14 +81,14 @@ export default function KeywordCounter() {
         <div className={styles.card}>
             <h2>Searched Keywords</h2>
             <div className={styles.formGroup}>
-                <label>🔍 View the unique keywords you’ve searched.</label>
+                <label>🔍 Review the keywords you’ve searched.</label>
             </div>
             <div className={styles.usageInfo}>
                 {records.length > 0
                     ? `You have ${records.length} saved searches.`
                     : loading
                         ? 'Loading...'
-                        : 'Perform a search to load your results.'}
+                        : 'Perform a search to populate your results.'}
             </div>
             <button
                 className={styles.button}
@@ -123,7 +123,7 @@ export default function KeywordCounter() {
                             {records.map((record, index) => (
                                 <tr key={record._id || `kw-${index}-${record.palabraClave}-${record.dominioFiltrado}-${record.dispositivo}`}>
                                     <td>{record.palabraClave || '-'}</td>
-                                    <td>{record.dominioFiltrado || '-'}</td>
+                                    <td>{record.dominio || record.dominioFiltrado || '-'}</td>
                                     <td>{record.dispositivo || '-'}</td>
                                     <td>
                                         {record.updatedAt

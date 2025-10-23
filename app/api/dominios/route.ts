@@ -52,7 +52,13 @@ export async function GET(request: Request) {
     }
 
     try {
-        let matchCriteria: any = { userId, dominioFiltrado: dominio };
+        let matchCriteria: any = {
+            userId,
+            $or: [
+                { dominioFiltrado: dominio },
+                { dominio: dominio }
+            ]
+        };
         if (keywordFilter) {
             matchCriteria.palabraClave = { $regex: new RegExp(`^${keywordFilter}$`, 'i') };
         }

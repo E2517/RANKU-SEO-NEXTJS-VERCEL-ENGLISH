@@ -60,7 +60,7 @@ export default function RankMapSection() {
             });
 
             if (!tileLayer || typeof tileLayer.addTo !== 'function') {
-                console.error("Tile layer is invalid or missing addTo method:", tileLayer);
+                console.error("Tile layer instance is invalid or missing addTo method:", tileLayer);
                 return;
             }
 
@@ -82,7 +82,7 @@ export default function RankMapSection() {
                 try {
                     mapInstance.remove();
                 } catch (cleanupError) {
-                    console.error("Error cleaning up map after useEffect failure:", cleanupError);
+                    console.error("Error cleaning up map after failure in useEffect:", cleanupError);
                 }
             }
             leafletMap.current = null;
@@ -143,8 +143,8 @@ export default function RankMapSection() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (isProcessing) return;
-        if (!keyword.trim() || !location.trim()) {
-            showToast.error('Please enter a keyword and location.', {
+        if (!keyword.trim() || !location.trim() || !domain.trim()) {
+            showToast.error('Please enter a keyword, location, and domain.', {
                 duration: 4000,
                 position: 'top-center',
                 transition: 'topBounce',
@@ -225,7 +225,7 @@ export default function RankMapSection() {
                 setMapData({ lat: mapCenterLat, lng: mapCenterLng, results: data.results });
             } else {
                 console.error("Could not obtain valid coordinates to center the map.");
-                showToast.error('Error: Could not geolocate the map center point.', {
+                showToast.error('Error: Could not geolocate the map center.', {
                     duration: 4000,
                     position: 'top-center',
                     transition: 'topBounce',
@@ -255,7 +255,7 @@ export default function RankMapSection() {
         <div className={styles.card}>
             <h2>RankMap – Business Geolocation</h2>
             <div className={styles.formGroup}>
-                <label>🚀 RankMap shows you the best businesses near you and gives you the power to analyze your competitors with surgical precision. Optimize your local visibility, dominate your area, and make sure customers find you where it truly matters. Because if you’re not on the map… Google will think you went on vacation. 😉</label>
+                <label>🚀 RankMap shows you the top businesses near you and gives you the power to analyze your competition with surgical precision. Optimize your local visibility, dominate your area, and make sure you’re found where it really matters. Because if you’re not on the map… Google will think you’re on vacation. 😉</label>
             </div>
             <form onSubmit={handleSubmit}>
                 <div className={styles.formGroup}>
@@ -263,12 +263,13 @@ export default function RankMapSection() {
                     <input
                         type="text"
                         className={styles.input}
-                        placeholder="E.g.: hair salon, lawyer, restaurant"
+                        placeholder="E.g., hair salon, lawyer, restaurant"
                         value={keyword}
                         onChange={(e) => {
                             setKeyword(e.target.value);
                             if (error) setError('');
                         }}
+                        required
                     />
                 </div>
                 <div className={styles.formGroup}>
@@ -276,22 +277,24 @@ export default function RankMapSection() {
                     <input
                         type="text"
                         className={styles.input}
-                        placeholder="E.g.: London, Mayfair"
+                        placeholder="E.g., Madrid, Calle las Ramblas Barcelona"
                         value={location}
                         onChange={(e) => {
                             setLocation(e.target.value);
                             if (error) setError('');
                         }}
+                        required
                     />
                 </div>
                 <div className={styles.formGroup}>
-                    <label>Domain (Optional):</label>
+                    <label>Domain:</label>
                     <input
                         type="text"
                         className={styles.input}
-                        placeholder="E.g.: mywebsite.com"
+                        placeholder="E.g., mywebsite.com"
                         value={domain}
                         onChange={(e) => setDomain(e.target.value)}
+                        required
                     />
                 </div>
                 <div className={styles.distanceFilter}>

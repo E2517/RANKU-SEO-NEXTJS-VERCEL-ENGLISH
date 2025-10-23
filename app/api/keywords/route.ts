@@ -21,6 +21,7 @@ export async function GET() {
             { userId, tipoBusqueda: 'palabraClave' },
             {
                 palabraClave: 1,
+                dominio: 1,
                 dominioFiltrado: 1,
                 dispositivo: 1,
                 buscador: 1,
@@ -40,23 +41,13 @@ export async function GET() {
 
         const campaignRecords = campaigns.map(c => ({
             palabraClave: c.keyword,
-            dominioFiltrado: c.domain,
+            dominio: c.domain,
             dispositivo: 'scanmap',
             buscador: 'scanmap',
             updatedAt: c.updatedAt || c.createdAt,
         }));
 
-        // SCANMAP IS INCLUDED IN KEYWORD COUNT
-
-        // const allRecords = [...searchResults, ...campaignRecords].sort(
-        //     (a, b) => {
-        //         const dateA = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
-        //         const dateB = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
-        //         return dateB - dateA;
-        //     }
-        // );
-
-        const allRecords = [...searchResults].sort(
+        const allRecords = [...searchResults, ...campaignRecords].sort(
             (a, b) => {
                 const dateA = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
                 const dateB = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
