@@ -25,6 +25,7 @@ export async function GET() {
             isSubscriptionCanceled: user.isSubscriptionCanceled || false,
             role: user.role,
             stripeCustomerId: user.stripeCustomerId,
+            limitKeywords: user.limitKeywords,
             limitScanMap: user.limitScanMap,
         },
     });

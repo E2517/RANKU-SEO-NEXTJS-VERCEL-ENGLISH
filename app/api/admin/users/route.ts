@@ -19,7 +19,7 @@ export async function GET() {
     }
 
     try {
-        const users = await User.find({}).select('email subscriptionPlan subscriptionStartDate subscriptionEndDate isSubscriptionCanceled createdAt');
+        const users = await User.find({}).select('email subscriptionPlan subscriptionStartDate subscriptionEndDate isSubscriptionCanceled createdAt limitKeywords limitScanMap');
         return NextResponse.json({ success: true, users });
     } catch (error) {
         console.error('Error fetching users:', error);

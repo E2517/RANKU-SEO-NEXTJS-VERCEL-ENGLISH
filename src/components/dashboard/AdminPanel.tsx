@@ -13,6 +13,8 @@ interface User {
     subscriptionEndDate?: string;
     isSubscriptionCanceled: boolean;
     createdAt: string;
+    limitKeywords: number;
+    limitScanMap: number;
 }
 
 interface TrialConfig {
@@ -54,7 +56,7 @@ export default function AdminPanel() {
                     });
                 }
             } catch (err: any) {
-                showToast.error(err.message || 'Network error while loading users', {
+                showToast.error(err.message || 'Network error loading users', {
                     duration: 4000,
                     position: 'top-center',
                     transition: 'topBounce',
@@ -113,7 +115,7 @@ export default function AdminPanel() {
             }
             const data = await res.json();
             if (data.success) {
-                showToast.success(`Keyword limits reset. Users updated: ${data.updated}`, {
+                showToast.success(`Limits reset. Updated users: ${data.updated}`, {
                     duration: 4000,
                     position: 'top-center',
                     transition: 'topBounce',
@@ -128,7 +130,7 @@ export default function AdminPanel() {
                 });
             }
         } catch (err: any) {
-            showToast.error(err.message || 'Network error while resetting limits', {
+            showToast.error(err.message || 'Network error resetting limits', {
                 duration: 4000,
                 position: 'top-center',
                 transition: 'topBounce',
@@ -151,7 +153,7 @@ export default function AdminPanel() {
             }
             const data = await res.json();
             if (data.success) {
-                showToast.success(`Keywords updated. Records processed: ${data.updated}`, {
+                showToast.success(`Keywords updated. Processed records: ${data.updated}`, {
                     duration: 4000,
                     position: 'top-center',
                     transition: 'topBounce',
@@ -166,7 +168,7 @@ export default function AdminPanel() {
                 });
             }
         } catch (err: any) {
-            showToast.error(err.message || 'Network error while updating keywords', {
+            showToast.error(err.message || 'Network error updating keywords', {
                 duration: 4000,
                 position: 'top-center',
                 transition: 'topBounce',
@@ -213,7 +215,7 @@ export default function AdminPanel() {
                 });
             }
         } catch (err: any) {
-            showToast.error(err.message || 'Network error while saving configuration', {
+            showToast.error(err.message || 'Network error saving configuration', {
                 duration: 4000,
                 position: 'top-center',
                 transition: 'topBounce',
@@ -297,6 +299,8 @@ export default function AdminPanel() {
                             <th>End</th>
                             <th>Canceled</th>
                             <th>Registered</th>
+                            <th>Keywords</th>
+                            <th>ScanMap</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -309,11 +313,13 @@ export default function AdminPanel() {
                                     <td>{user.subscriptionEndDate ? new Date(user.subscriptionEndDate).toLocaleDateString() : '-'}</td>
                                     <td><span className={user.isSubscriptionCanceled ? styles.statusRed : styles.statusGreen}>{user.isSubscriptionCanceled ? 'Yes' : 'No'}</span></td>
                                     <td>{new Date(user.createdAt).toLocaleDateString()}</td>
+                                    <td>{user.limitKeywords}</td>
+                                    <td>{user.limitScanMap}</td>
                                 </tr>
                             ))
                         ) : (
                             <tr>
-                                <td colSpan={6} className={styles.noData}>No registered users.</td>
+                                <td colSpan={8} className={styles.noData}>No registered users.</td>
                             </tr>
                         )}
                     </tbody>
