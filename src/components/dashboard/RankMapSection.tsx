@@ -255,7 +255,7 @@ export default function RankMapSection() {
         <div className={styles.card}>
             <h2>RankMap – Business Geolocation</h2>
             <div className={styles.formGroup}>
-                <label>🔍 Discover the best businesses near you with RankMap...</label>
+                <label>🚀 RankMap shows you the best businesses near you and gives you the power to analyze your competitors with surgical precision. Optimize your local visibility, dominate your area, and make sure customers find you where it truly matters. Because if you’re not on the map… Google will think you went on vacation. 😉</label>
             </div>
             <form onSubmit={handleSubmit}>
                 <div className={styles.formGroup}>

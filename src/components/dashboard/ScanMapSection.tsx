@@ -219,7 +219,7 @@ export default function ScanMapSection() {
         <div className={styles.card}>
             <h2>ScanMap – Local Visibility</h2>
             <div className={styles.formGroup}>
-                <label>🥷 A domain’s visibility in search engines varies by location...</label>
+                <label>🥷🥷 A domain’s visibility changes depending on the user’s location, because Google — like a good digital neighbor — knows exactly who lives in every neighborhood. Search engines adjust results based on local relevance and regional preferences.</label>
             </div>
             <form onSubmit={handleSubmit}>
                 <div className={styles.formGroup}>

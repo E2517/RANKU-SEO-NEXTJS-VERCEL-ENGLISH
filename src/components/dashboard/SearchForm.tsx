@@ -104,7 +104,8 @@ export default function SearchForm() {
             <h2 style={{ color: '#6c4ab6', fontSize: '1.5rem', fontWeight: '700', marginBottom: '1rem' }}>Run Search</h2>
             <div style={{ marginBottom: '1.25rem' }}>
                 <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#374151' }}>
-                    🔎 Discover the keywords that rank your domain in each location
+                    🌎 Discover the keywords that boost your domain in every location.
+                    Analyze where you shine the brightest (and where you need a little extra focus) with real positioning data. Local SEO has never been this clear… or this fun. 😎📈
                 </label>
             </div>
             <form onSubmit={handleSubmit}>
