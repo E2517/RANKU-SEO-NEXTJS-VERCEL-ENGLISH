@@ -203,12 +203,11 @@ export default function Home() {
               <ul className="card-features">
                 <li>250 keywords</li>
                 <li>Multi-device analysis (Desktop + Mobile + Local)</li>
-                <li>Domain History</li>
-                <li>Search history (by keyword or domain)</li>
                 <li>Daily (24h) and weekly (7-day) updates</li>
                 <li>Competitor analysis</li>
                 <li>✅ RankMap: Google Maps ranking by location</li>
                 <li>🥷 ScanMap: Domain visibility based on user location (5 searches/month)</li>
+                <li>🧠 AI Intelligence</li>
                 <li>📈 Smart statistics</li>
                 <li>Downloadable Excel report</li>
                 <li>Downloadable SEO PDF report</li>
@@ -227,12 +226,11 @@ export default function Home() {
               <ul className="card-features">
                 <li>500 keywords</li>
                 <li>Multi-device analysis (Desktop + Mobile + Local)</li>
-                <li>Domain History</li>
-                <li>Search history (by keyword or domain)</li>
                 <li>Daily (24h) and weekly (7-day) updates</li>
                 <li>Competitor analysis</li>
                 <li>✅ RankMap: Google Maps ranking by location</li>
                 <li>🥷 ScanMap: Domain visibility based on user location (10 searches/month)</li>
+                <li>🧠 AI Intelligence</li>
                 <li>📈 Smart statistics</li>
                 <li>Downloadable Excel report</li>
                 <li>Downloadable SEO PDF report</li>
@@ -251,12 +249,11 @@ export default function Home() {
               <ul className="card-features">
                 <li>1,000 keywords</li>
                 <li>Multi-device analysis (Desktop + Mobile + Local)</li>
-                <li>Domain History</li>
-                <li>Search history (by keyword or domain)</li>
                 <li>Daily (24h) and weekly (7-day) updates</li>
                 <li>Competitor analysis</li>
                 <li>✅ RankMap: Google Maps ranking by location</li>
                 <li>🥷 ScanMap: Domain visibility based on user location (15 searches/month)</li>
+                <li>🧠 AI Intelligence</li>
                 <li>📈 Smart statistics</li>
                 <li>Downloadable Excel report</li>
                 <li>Downloadable SEO PDF report</li>
