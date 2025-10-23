@@ -262,7 +262,7 @@ export default function ProfileSection() {
                     <h3>Basico</h3>
                     <div className={styles.planPrice}>$50<span className={styles.period}>/month</span></div>
                     <ul>
-                        <li>250 tracked keywords</li>
+                        <li>250 keywords</li>
                         <li>Multi-device analysis (Desktop + Mobile + Local)</li>
                         <li>Domain History</li>
                         <li>Search history (by keyword or domain)</li>
@@ -281,7 +281,7 @@ export default function ProfileSection() {
                     <h3>Pro</h3>
                     <div className={styles.planPrice}>$100<span className={styles.period}>/month</span></div>
                     <ul>
-                        <li>500 tracked keywords</li>
+                        <li>500 keywords</li>
                         <li>Multi-device analysis (Desktop + Mobile + Local)</li>
                         <li>Domain History</li>
                         <li>Search history (by keyword or domain)</li>
@@ -300,7 +300,7 @@ export default function ProfileSection() {
                     <h3>Ultra</h3>
                     <div className={styles.planPrice}>$250<span className={styles.period}>/month</span></div>
                     <ul>
-                        <li>1,000 tracked keywords</li>
+                        <li>1,000 keywords</li>
                         <li>Multi-device analysis (Desktop + Mobile + Local)</li>
                         <li>Domain History</li>
                         <li>Search history (by keyword or domain)</li>

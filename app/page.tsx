@@ -201,7 +201,7 @@ export default function Home() {
                 </div>
               </div>
               <ul className="card-features">
-                <li>250 tracked keywords</li>
+                <li>250 keywords</li>
                 <li>Multi-device analysis (Desktop + Mobile + Local)</li>
                 <li>Domain History</li>
                 <li>Search history (by keyword or domain)</li>
@@ -225,7 +225,7 @@ export default function Home() {
                 </div>
               </div>
               <ul className="card-features">
-                <li>500 tracked keywords</li>
+                <li>500 keywords</li>
                 <li>Multi-device analysis (Desktop + Mobile + Local)</li>
                 <li>Domain History</li>
                 <li>Search history (by keyword or domain)</li>
@@ -249,7 +249,7 @@ export default function Home() {
                 </div>
               </div>
               <ul className="card-features">
-                <li>1,000 tracked keywords</li>
+                <li>1,000 keywords</li>
                 <li>Multi-device analysis (Desktop + Mobile + Local)</li>
                 <li>Domain History</li>
                 <li>Search history (by keyword or domain)</li>
