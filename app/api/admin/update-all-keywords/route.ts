@@ -74,22 +74,28 @@ export async function GET() {
     const userId = cookieStore.get('user_id')?.value;
 
     if (!userId) {
-        return NextResponse.json({ success: false, message: 'Not authenticated.' }, { status: 401 });
+        return NextResponse.json({ success: false, message: 'No autenticado.' }, { status: 401 });
     }
 
     await connectDB();
 
     const user = await User.findById(userId);
     if (!user || user.role !== 'admin') {
-        return NextResponse.json({ success: false, message: 'Access denied.' }, { status: 403 });
+        return NextResponse.json({ success: false, message: 'Acceso denegado.' }, { status: 403 });
     }
 
     if (!SERPAPI_API_KEY) {
-        return NextResponse.json({ success: false, message: 'SerpAPI is not configured.' }, { status: 500 });
+        return NextResponse.json({ success: false, message: 'SerpAPI no configurada.' }, { status: 500 });
     }
 
     try {
         const allKeywords = await SearchResult.aggregate<AggregatedKeyword>([
+            {
+                $match: {
+                    buscador: { $in: ['google', 'google_local'] },
+                    tipoBusqueda: 'palabraClave'
+                }
+            },
             {
                 $group: {
                     _id: {
@@ -104,7 +110,7 @@ export async function GET() {
         ]);
 
         if (allKeywords.length === 0) {
-            return NextResponse.json({ success: true, message: 'No keywords to update.', updated: 0 });
+            return NextResponse.json({ success: true, message: 'No hay keywords para actualizar.', updated: 0 });
         }
 
         let updatedCount = 0;
@@ -125,53 +131,60 @@ export async function GET() {
                         engine: 'google_local',
                         location: location,
                         google_domain: 'google.com',
-                        // gl: 'us',
                         hl: 'en',
                         num: 20,
                         start: start,
                         device: 'mobile'
                     };
 
-                    const response = await axios.get<SerpApiResponse>('https://serpapi.com/search  ', { params });
-                    const pageResults = response.data.local_results || response.data.ads_results || [];
-                    if (pageResults.length === 0) break;
+                    try {
+                        const response = await axios.get<SerpApiResponse>('https://serpapi.com/search', { params });
+                        const pageResults = response.data.local_results || response.data.ads_results || [];
+                        if (pageResults.length === 0) break;
 
-                    let foundInPage = false;
-                    for (const result of pageResults) {
-                        if (result.position !== undefined) {
-                            let resultDomain: string | null = null;
+                        let foundInPage = false;
+                        for (const result of pageResults) {
+                            if (result.position !== undefined) {
+                                let resultDomain: string | null = null;
 
-                            if (result.website) {
-                                resultDomain = normalizeDomain(result.website);
-                            } else if (result.links?.website) {
-                                resultDomain = normalizeDomain(result.links.website);
-                            }
+                                if (result.website) {
+                                    resultDomain = normalizeDomain(result.website);
+                                } else if (result.links?.website) {
+                                    resultDomain = normalizeDomain(result.links.website);
+                                }
 
-                            if (!resultDomain && result.title) {
-                                const cleanTitle = result.title.toLowerCase().replace(/[^a-z0-9]/g, '');
-                                const domainBase = dominioFiltrado
-                                    .replace(/^(www\.)?/, '')
-                                    .replace(/\.(es|com|net|org|eu|io|co)$/, '')
-                                    .toLowerCase()
-                                    .replace(/[^a-z0-9]/g, '');
+                                if (!resultDomain && result.title) {
+                                    const cleanTitle = result.title.toLowerCase().replace(/[^a-z0-9]/g, '');
+                                    const domainBase = dominioFiltrado
+                                        .replace(/^(www\.)?/, '')
+                                        .replace(/\.(es|com|net|org|eu|io|co)$/, '')
+                                        .toLowerCase()
+                                        .replace(/[^a-z0-9]/g, '');
 
-                                if (cleanTitle.includes(domainBase) || domainBase.includes(cleanTitle)) {
-                                    resultDomain = dominioFiltrado;
+                                    if (cleanTitle.includes(domainBase) || domainBase.includes(cleanTitle)) {
+                                        resultDomain = dominioFiltrado;
+                                    }
+                                }
+
+                                if (resultDomain === dominioFiltrado) {
+                                    position = start + result.position;
+                                    rating = result.rating || null;
+                                    reviews = result.reviews || null;
+                                    foundDomain = resultDomain;
+                                    foundInPage = true;
+                                    break;
                                 }
                             }
-
-                            if (resultDomain === dominioFiltrado) {
-                                position = start + result.position;
-                                rating = result.rating || null;
-                                reviews = result.reviews || null;
-                                foundDomain = resultDomain;
-                                foundInPage = true;
-                                break;
-                            }
                         }
-                    }
 
-                    if (foundInPage) break;
+                        if (foundInPage) break;
+                    } catch (error: any) {
+                        if (error.response?.status === 400 && typeof error.response.data?.error === 'string' && error.response.data.error.includes('location')) {
+                            console.warn(`Saltando keyword por error de localización: ${palabraClave} - ${location}`);
+                            break;
+                        }
+                        throw error;
+                    }
                 }
 
                 if (position > 0) {
@@ -225,33 +238,41 @@ export async function GET() {
                         q: location ? `${palabraClave} ${location}` : palabraClave,
                         engine: 'google',
                         location: location,
-                        google_domain: 'google.com',
-                        // gl: 'us',
-                        hl: 'en',
+                        google_domain: 'google.es',
+                        gl: 'es',
+                        hl: 'es',
                         num: 10,
                         start: start,
                         device: dispositivo
                     };
 
-                    const response = await axios.get<SerpApiResponse>('https://serpapi.com/search  ', { params });
-                    const organic = response.data.organic_results || [];
-                    if (organic.length === 0) break;
+                    try {
+                        const response = await axios.get<SerpApiResponse>('https://serpapi.com/search', { params });
+                        const organic = response.data.organic_results || [];
+                        if (organic.length === 0) break;
 
-                    let foundInPage = false;
-                    for (let i = 0; i < organic.length; i++) {
-                        const result = organic[i];
-                        if (result.link) {
-                            const resultDomain = normalizeDomain(result.link);
-                            if (resultDomain === dominioFiltrado) {
-                                position = start + (result.position || i + 1);
-                                foundDomain = resultDomain;
-                                foundInPage = true;
-                                break;
+                        let foundInPage = false;
+                        for (let i = 0; i < organic.length; i++) {
+                            const result = organic[i];
+                            if (result.link) {
+                                const resultDomain = normalizeDomain(result.link);
+                                if (resultDomain === dominioFiltrado) {
+                                    position = start + (result.position || i + 1);
+                                    foundDomain = resultDomain;
+                                    foundInPage = true;
+                                    break;
+                                }
                             }
                         }
-                    }
 
-                    if (foundInPage) break;
+                        if (foundInPage) break;
+                    } catch (error: any) {
+                        if (error.response?.status === 400 && typeof error.response.data?.error === 'string' && error.response.data.error.includes('location')) {
+                            console.warn(`Saltando keyword por error de localización: ${palabraClave} - ${location}`);
+                            break;
+                        }
+                        throw error;
+                    }
                 }
 
                 if (position > 0) {
@@ -296,9 +317,9 @@ export async function GET() {
             }
         }
 
-        return NextResponse.json({ success: true, message: 'Keywords updated.', updated: updatedCount });
+        return NextResponse.json({ success: true, message: 'Keywords actualizadas.', updated: updatedCount });
     } catch (error: any) {
-        console.error('Error updating keywords:', error.response?.data || error.message || error);
-        return NextResponse.json({ success: false, message: 'Error updating keywords.' }, { status: 500 });
+        console.error('Error actualizando keywords:', error.response?.data || error.message || error);
+        return NextResponse.json({ success: false, message: 'Error al actualizar las keywords.' }, { status: 500 });
     }
 }
