@@ -1,4 +1,3 @@
-
 import { Schema, model, models, Model, Types } from 'mongoose';
 
 export interface ISearchResult {
@@ -7,8 +6,11 @@ export interface ISearchResult {
     buscador?: string;
     dispositivo?: string;
     posicion?: number;
-    posicionAnterior?: number | null;
-    fechaPosicionAnterior?: Date | null;
+    posicionAnterior24h: number | null;
+    posicionAnterior7d: number | null;
+    posicionAnterior30d: number | null;
+    last7dUpdate: Date | null;
+    last30dUpdate: Date | null;
     palabraClave?: string;
     dominio?: string;
     tipoBusqueda: 'palabraClave' | 'dominio';
@@ -34,8 +36,11 @@ const searchResultSchema = new Schema<ISearchResult, SearchResultModel>(
         buscador: String,
         dispositivo: String,
         posicion: Number,
-        posicionAnterior: { type: Number, default: null },
-        fechaPosicionAnterior: { type: Date, default: null },
+        posicionAnterior24h: { type: Number, default: null },
+        posicionAnterior7d: { type: Number, default: null },
+        posicionAnterior30d: { type: Number, default: null },
+        last7dUpdate: { type: Date, default: null },
+        last30dUpdate: { type: Date, default: null },
         palabraClave: String,
         dominio: String,
         tipoBusqueda: {
@@ -58,7 +63,6 @@ searchResultSchema.index({
     location: 1,
     dispositivo: 1,
     buscador: 1,
-    createdAt: -1,
 });
 
 const SearchResult = (models.SearchResult as SearchResultModel) || model<ISearchResult, SearchResultModel>('SearchResult', searchResultSchema);

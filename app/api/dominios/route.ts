@@ -5,9 +5,14 @@ import LocalVisibilityCampaign from '@/models/LocalVisibilityCampaign';
 import { connectDB } from '@/lib/mongoose';
 import { Types } from 'mongoose';
 
-function calculateTrend(currentPos: number, pastPos: number | null) {
-    let tendencia = { posicionAnterior: null as number | null, diferencia: null as number | null, color: 'gray', simbolo: '—' };
-    if (pastPos !== null && pastPos > 0) {
+function calculateTrendFromField(currentPos: number, pastPos: number | null | undefined) {
+    let tendencia = {
+        posicionAnterior: null as number | null,
+        diferencia: null as number | null,
+        color: 'gray',
+        simbolo: '—'
+    };
+    if (pastPos !== null && pastPos !== undefined && pastPos > 0) {
         const diferencia = pastPos - currentPos;
         tendencia.posicionAnterior = pastPos;
         tendencia.diferencia = diferencia;
@@ -39,7 +44,6 @@ export async function GET(request: Request) {
     try {
         userId = new Types.ObjectId(userIdStr);
     } catch (e) {
-        console.error(e)
         return NextResponse.json({ success: false, message: 'Invalid user ID.' }, { status: 400 });
     }
 
@@ -93,7 +97,9 @@ export async function GET(request: Request) {
                 dominio: latestScanMap.domain,
                 dominioFiltrado: latestScanMap.domain,
                 posicion: null,
-                posicionAnterior: null,
+                posicionAnterior24h: null,
+                posicionAnterior7d: null,
+                posicionAnterior30d: null,
                 buscador: 'scanmap',
                 dispositivo: 'scanmap',
                 location: latestScanMap.centerLocation?.name || 'N/A',
@@ -103,14 +109,16 @@ export async function GET(request: Request) {
                 reviews: null,
                 tipoBusqueda: 'palabraClave',
                 tendencia24h: { posicionAnterior: null, diferencia: null, color: 'gray', simbolo: '—' },
-                tendencia7d: { posicionAnterior: null, diferencia: null, color: 'gray', simbolo: '—' }
+                tendencia7d: { posicionAnterior: null, diferencia: null, color: 'gray', simbolo: '—' },
+                tendencia30d: { posicionAnterior: null, diferencia: null, color: 'gray', simbolo: '—' }
             };
         }
 
         const enrichedResults = aggregationResults.map(result => ({
             ...result,
-            tendencia24h: calculateTrend(result.posicion, result.posicionAnterior),
-            tendencia7d: calculateTrend(result.posicion, result.posicionAnterior)
+            tendencia24h: calculateTrendFromField(result.posicion, result.posicionAnterior24h),
+            tendencia7d: calculateTrendFromField(result.posicion, result.posicionAnterior7d),
+            tendencia30d: calculateTrendFromField(result.posicion, result.posicionAnterior30d)
         }));
 
         if (scanMapRecord) {

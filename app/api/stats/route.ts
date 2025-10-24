@@ -31,67 +31,52 @@ function calculateTrendFromSavedData(currentPos: number, savedPreviousPos: numbe
 }
 
 async function enrichHistoryWithTrend(historyResults: any[]) {
-    console.log("[API stats - enrichHistoryWithTrend] Iniciando cálculo de tendencias desde datos guardados.");
     const enrichedResults = historyResults.map(result => {
         const currentPos = result.posicion;
-        const savedPreviousPos = result.posicionAnterior;
-        const tendencia24h = calculateTrendFromSavedData(currentPos, savedPreviousPos);
-
-        const savedPreviousPos7d = result.posicionAnterior;
-        const tendencia7d = calculateTrendFromSavedData(currentPos, savedPreviousPos7d);
+        const tendencia24h = calculateTrendFromSavedData(currentPos, result.posicionAnterior24h);
+        const tendencia7d = calculateTrendFromSavedData(currentPos, result.posicionAnterior7d);
+        const tendencia30d = calculateTrendFromSavedData(currentPos, result.posicionAnterior30d);
 
         return {
             ...result.toObject(),
             tendencia24h,
-            tendencia7d
+            tendencia7d,
+            tendencia30d
         };
     });
-    console.log("[API stats - enrichHistoryWithTrend] Cálculo completado para", enrichedResults.length, "registros.");
     return enrichedResults;
 }
 
-
 export async function GET(req: NextRequest) {
-    console.log("[API stats] Iniciando solicitud...");
     await connectDB();
     const cookieStore = await cookies();
     const userIdStr = cookieStore.get('user_id')?.value;
     if (!userIdStr) {
-        console.log("[API stats] No se encontró user_id en las cookies.");
-        return NextResponse.json({ success: false, message: 'No autenticado.' }, { status: 401 });
+        return NextResponse.json({ success: false, message: 'Not authenticated.' }, { status: 401 });
     }
     let userId;
     try {
         userId = new Types.ObjectId(userIdStr);
-        console.log("[API stats] User ID parseado:", userId);
     } catch (e) {
-        console.error("[API stats] Error parseando user_id:", e);
-        return NextResponse.json({ success: false, message: 'ID de usuario inválido.' }, { status: 400 });
+        return NextResponse.json({ success: false, message: 'Invalid user ID.' }, { status: 400 });
     }
 
     const { searchParams } = new URL(req.url);
     const domain = searchParams.get('domain') || '';
     const keyword = searchParams.get('keyword') || '';
-    console.log("[API stats] Parámetros recibidos - domain:", domain, "keyword:", keyword);
 
     try {
         const matchBase: any = { userId, tipoBusqueda: 'palabraClave' };
         if (domain) matchBase.dominio = domain;
         if (keyword) matchBase.palabraClave = keyword;
-        console.log("[API stats] Criterios de búsqueda:", matchBase);
 
-        const allResults = await SearchResult.find(matchBase).sort({ createdAt: -1 });
-        console.log("[API stats] SearchResult encontrados:", allResults.length);
-
+        const allResults = await SearchResult.find(matchBase);
         const enriched = await enrichHistoryWithTrend(allResults);
-        console.log("[API stats] SearchResult después de enrichHistoryWithTrend:", enriched.length);
 
         const uniqueKeyFields = ['palabraClave', 'location', 'dispositivo', 'buscador', 'dominio'];
         const uniqueMap = new Map();
         enriched.forEach(r => {
-            if (!r.dominio || r.dominio === 'N/A') {
-                return;
-            }
+            if (!r.dominio || r.dominio === 'N/A') return;
             const key = uniqueKeyFields.map(f => (r as any)[f] || '').join('|');
             if (!uniqueMap.has(key)) {
                 uniqueMap.set(key, r);
@@ -99,12 +84,8 @@ export async function GET(req: NextRequest) {
         });
 
         const uniqueEnriched = Array.from(uniqueMap.values());
-        console.log("[API stats] Total registros únicos después de agrupar:", uniqueEnriched.length);
-
         const domains = [...new Set(allResults.map(r => r.dominio).filter(d => d && d !== 'N/A'))];
         const keywords = [...new Set(uniqueEnriched.map(r => r.palabraClave))];
-        console.log("[API stats] Dominios únicos:", domains.length);
-        console.log("[API stats] Keywords únicas:", keywords.length);
 
         let improved24h = 0, worsened24h = 0;
         uniqueEnriched.forEach(r => {
@@ -113,7 +94,6 @@ export async function GET(req: NextRequest) {
                 else if (r.tendencia24h.diferencia < 0) worsened24h++;
             }
         });
-        console.log("[API stats] Mejoradas (24h):", improved24h, "Empeoradas (24h):", worsened24h);
 
         const domainImprovement: Record<string, { mejoraTotal: number; count: number }> = {};
         uniqueEnriched.forEach(r => {
@@ -130,10 +110,6 @@ export async function GET(req: NextRequest) {
             .map(([dominio, data]) => ({ dominio, mejoraAbsoluta: data.mejoraTotal }))
             .sort((a, b) => b.mejoraAbsoluta - a.mejoraAbsoluta)
             .slice(0, 3);
-        console.log("[API stats] Top 3 dominios:", topDomains);
-
-        console.log("[API stats] Enviando respuesta final.");
-        console.log("[API stats] Ejemplo de registro con tendencias:", uniqueEnriched[0]); // Solo el primero para no saturar
 
         return NextResponse.json({
             success: true,
@@ -147,7 +123,7 @@ export async function GET(req: NextRequest) {
             }
         });
     } catch (err) {
-        console.error('[API stats] Error interno:', err);
-        return NextResponse.json({ success: false, message: 'Error interno.' }, { status: 500 });
+        console.error('[API stats] Internal error:', err);
+        return NextResponse.json({ success: false, message: 'Internal error.' }, { status: 500 });
     }
 }

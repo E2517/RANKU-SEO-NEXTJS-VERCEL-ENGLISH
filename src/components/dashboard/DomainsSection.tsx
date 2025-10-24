@@ -11,20 +11,14 @@ export default function DomainsSection() {
 
     useEffect(() => {
         const fetchDomains = async () => {
-            console.log('Iniciando fetch de dominios desde cliente');
             try {
                 const res = await fetch('/api/historial-options-domains');
-                console.log('Respuesta de /api/historial-options-domains:', res.status, res.ok);
                 const data = await res.json();
-                console.log('Datos recibidos de la API de dominios:', data);
                 if (data.success) {
                     setDomainOptions(data.domains);
-                    console.log('Opciones de dominio establecidas:', data.domains);
-                } else {
-                    console.warn('API devolvió éxito: false al cargar dominios:', data.message);
                 }
             } catch (error) {
-                console.error('Error al cargar dominios:', error);
+                console.error('Error loading domains:', error);
             }
         };
         fetchDomains();
@@ -32,19 +26,12 @@ export default function DomainsSection() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        console.log('Formulario enviado. Dominio:', domain, 'Keyword:', keywordFilter);
         setResults([]);
         setIsSubmitting(true);
         try {
             const url = `/api/dominios?dominio=${encodeURIComponent(domain)}${keywordFilter ? `&keywordFilter=${encodeURIComponent(keywordFilter)}` : ''}`;
-            console.log('Realizando fetch a:', url);
             const res = await fetch(url);
-            console.log('Respuesta de historial-busquedas:', res.status, res.ok);
-            if (!res.ok) {
-                throw new Error(`HTTP ${res.status}: ${res.statusText}`);
-            }
             const data = await res.json();
-            console.log('Datos recibidos de historial-busquedas:', data);
             if (data.success) {
                 setResults(data.historial || []);
                 showToast.success('Results loaded.', {
@@ -53,7 +40,6 @@ export default function DomainsSection() {
                     transition: 'topBounce',
                     sound: true,
                 });
-                console.log('Resultados establecidos:', data.historial?.length || 0, 'registros');
             } else {
                 showToast.error(data.message, {
                     duration: 4000,
@@ -61,11 +47,10 @@ export default function DomainsSection() {
                     transition: 'topBounce',
                     sound: true,
                 });
-                console.warn('API devolvió éxito: false en historial-busquedas:', data.message);
             }
         } catch (error) {
-            console.error('Error al cargar historial:', error);
-            showToast.error('Connection error with the server.', {
+            console.error('Error loading history:', error);
+            showToast.error('Server connection error.', {
                 duration: 4000,
                 position: 'top-center',
                 transition: 'topBounce',
@@ -73,7 +58,6 @@ export default function DomainsSection() {
             });
         } finally {
             setIsSubmitting(false);
-            console.log('Finalizada solicitud de historial');
         }
     };
 
@@ -116,7 +100,7 @@ export default function DomainsSection() {
                     <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: '#374151' }}>Filter by Keyword (optional):</label>
                     <input
                         type="text"
-                        placeholder="E.g.: criminal lawyer"
+                        placeholder="e.g. criminal lawyer"
                         value={keywordFilter}
                         onChange={(e) => setKeywordFilter(e.target.value)}
                         style={{ width: '100%', padding: '10px', border: '1px solid #d1d5db', borderRadius: '0.5rem', fontSize: '1rem' }}
@@ -149,8 +133,9 @@ export default function DomainsSection() {
                                 <th style={{ border: '1px solid #e5e7eb', padding: '12px', textAlign: 'left', background: '#f9fafb', fontWeight: '700', color: '#4b5563', fontSize: '0.75rem', textTransform: 'uppercase' }}>Keyword</th>
                                 <th style={{ border: '1px solid #e5e7eb', padding: '12px', textAlign: 'left', background: '#f9fafb', fontWeight: '700', color: '#4b5563', fontSize: '0.75rem', textTransform: 'uppercase' }}>Domain</th>
                                 <th style={{ border: '1px solid #e5e7eb', padding: '12px', textAlign: 'left', background: '#f9fafb', fontWeight: '700', color: '#4b5563', fontSize: '0.75rem', textTransform: 'uppercase' }}>Position</th>
-                                <th style={{ border: '1px solid #e5e7eb', padding: '12px', textAlign: 'left', background: '#f9fafb', fontWeight: '700', color: '#4b5563', fontSize: '0.75rem', textTransform: 'uppercase' }}>24h</th>
+                                <th style={{ border: '1px solid #e5e7eb', padding: '12px', textAlign: 'left', background: '#f9fafb', fontWeight: '700', color: '#4b5563', fontSize: '0.75rem', textTransform: 'uppercase' }}>24 hours</th>
                                 <th style={{ border: '1px solid #e5e7eb', padding: '12px', textAlign: 'left', background: '#f9fafb', fontWeight: '700', color: '#4b5563', fontSize: '0.75rem', textTransform: 'uppercase' }}>7 days</th>
+                                <th style={{ border: '1px solid #e5e7eb', padding: '12px', textAlign: 'left', background: '#f9fafb', fontWeight: '700', color: '#4b5563', fontSize: '0.75rem', textTransform: 'uppercase' }}>30 days</th>
                                 <th style={{ border: '1px solid #e5e7eb', padding: '12px', textAlign: 'left', background: '#f9fafb', fontWeight: '700', color: '#4b5563', fontSize: '0.75rem', textTransform: 'uppercase' }}>Search Engine</th>
                                 <th style={{ border: '1px solid #e5e7eb', padding: '12px', textAlign: 'left', background: '#f9fafb', fontWeight: '700', color: '#4b5563', fontSize: '0.75rem', textTransform: 'uppercase' }}>Device</th>
                                 <th style={{ border: '1px solid #e5e7eb', padding: '12px', textAlign: 'left', background: '#f9fafb', fontWeight: '700', color: '#4b5563', fontSize: '0.75rem', textTransform: 'uppercase' }}>Location</th>
@@ -167,6 +152,9 @@ export default function DomainsSection() {
                                     </td>
                                     <td style={{ border: '1px solid #e5e7eb', padding: '12px' }}>
                                         {renderTrend(r.tendencia7d)}
+                                    </td>
+                                    <td style={{ border: '1px solid #e5e7eb', padding: '12px' }}>
+                                        {renderTrend(r.tendencia30d)}
                                     </td>
                                     <td style={{ border: '1px solid #e5e7eb', padding: '12px' }}>{r.buscador || 'N/A'}</td>
                                     <td style={{ border: '1px solid #e5e7eb', padding: '12px' }}>

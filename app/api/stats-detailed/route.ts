@@ -31,46 +31,36 @@ function calculateTrendFromSavedData(currentPos: number, savedPreviousPos: numbe
     return tendencia;
 }
 
-
 export async function GET(req: NextRequest) {
-    console.log("[API stats-detailed] Iniciando solicitud...");
     await connectDB();
     const cookieStore = await cookies();
     const userIdStr = cookieStore.get('user_id')?.value;
     if (!userIdStr) {
-        console.log("[API stats-detailed] No se encontró user_id en las cookies.");
-        return NextResponse.json({ success: false, message: 'No autenticado.' }, { status: 401 });
+        return NextResponse.json({ success: false, message: 'Not authenticated.' }, { status: 401 });
     }
     let userId;
     try {
         userId = new Types.ObjectId(userIdStr);
-        console.log("[API stats-detailed] User ID parseado:", userId);
     } catch (e) {
-        console.error("[API stats-detailed] Error parseando user_id:", e);
-        return NextResponse.json({ success: false, message: 'ID de usuario inválido.' }, { status: 400 });
+        return NextResponse.json({ success: false, message: 'Invalid user ID.' }, { status: 400 });
     }
 
     const { searchParams } = new URL(req.url);
     const domain = searchParams.get('domain') || '';
     const keyword = searchParams.get('keyword') || '';
-    console.log("[API stats-detailed] Parámetros recibidos - domain:", domain, "keyword:", keyword);
 
     try {
         const matchBase: any = { userId, tipoBusqueda: 'palabraClave' };
         if (domain) matchBase.dominio = domain;
         if (keyword) matchBase.palabraClave = keyword;
-        console.log("[API stats-detailed] Criterios de búsqueda para SearchResult:", matchBase);
 
-        const searchResults = await SearchResult.find(matchBase).sort({ createdAt: -1 });
-        console.log("[API stats-detailed] SearchResult encontrados:", searchResults.length);
+        const searchResults = await SearchResult.find(matchBase);
 
         const campaignMatch: any = { userId };
         if (domain) campaignMatch.domain = domain;
         if (keyword) campaignMatch.keyword = keyword;
-        console.log("[API stats-detailed] Criterios de búsqueda para LocalVisibilityCampaign:", campaignMatch);
 
-        const campaigns = await LocalVisibilityCampaign.find(campaignMatch).sort({ createdAt: -1 });
-        console.log("[API stats-detailed] LocalVisibilityCampaign encontrados:", campaigns.length);
+        const campaigns = await LocalVisibilityCampaign.find(campaignMatch);
 
         const campaignRecords = campaigns.map(c => ({
             _id: c._id,
@@ -78,7 +68,9 @@ export async function GET(req: NextRequest) {
             dominio: c.domain,
             dominioFiltrado: c.domain,
             posicion: null,
-            posicionAnterior: null,
+            posicionAnterior24h: null,
+            posicionAnterior7d: null,
+            posicionAnterior30d: null,
             buscador: 'scanmap',
             dispositivo: 'scanmap',
             location: c.centerLocation?.name || 'N/A',
@@ -90,14 +82,11 @@ export async function GET(req: NextRequest) {
         }));
 
         const allRecords = [...searchResults, ...campaignRecords];
-        console.log("[API stats-detailed] Total registros antes de agrupar (SearchResult + Campaigns):", allRecords.length);
 
         const uniqueKeyFields = ['palabraClave', 'location', 'dispositivo', 'buscador', 'dominio'];
         const uniqueMap = new Map();
         allRecords.forEach(r => {
-            if (!r.dominio || r.dominio === 'N/A') {
-                return;
-            }
+            if (!r.dominio || r.dominio === 'N/A') return;
             const key = uniqueKeyFields.map(f => (r as any)[f] || '').join('|');
             if (!uniqueMap.has(key)) {
                 uniqueMap.set(key, r);
@@ -105,17 +94,17 @@ export async function GET(req: NextRequest) {
         });
 
         const uniqueRecords = Array.from(uniqueMap.values());
-        console.log("[API stats-detailed] Total registros únicos después de agrupar:", uniqueRecords.length);
 
         const detailedResults = uniqueRecords.map(r => {
             if (typeof r.posicion === 'number' && r.posicion > 0) {
                 const currentPos = r.posicion;
-                const savedPreviousPos = r.posicionAnterior;
-                const tend24 = calculateTrendFromSavedData(currentPos, savedPreviousPos);
-                const tend7d = calculateTrendFromSavedData(currentPos, savedPreviousPos);
+                const tend24 = calculateTrendFromSavedData(currentPos, r.posicionAnterior24h);
+                const tend7d = calculateTrendFromSavedData(currentPos, r.posicionAnterior7d);
+                const tend30d = calculateTrendFromSavedData(currentPos, r.posicionAnterior30d);
 
                 let change24h = '—';
                 let change7d = '—';
+                let change30d = '—';
 
                 if (tend24.diferencia !== null) {
                     const sign = tend24.diferencia > 0 ? '+' : '';
@@ -125,6 +114,10 @@ export async function GET(req: NextRequest) {
                     const sign = tend7d.diferencia > 0 ? '+' : '';
                     change7d = `${sign}${tend7d.diferencia} ${tend7d.simbolo}`;
                 }
+                if (tend30d.diferencia !== null) {
+                    const sign = tend30d.diferencia > 0 ? '+' : '';
+                    change30d = `${sign}${tend30d.diferencia} ${tend30d.simbolo}`;
+                }
 
                 return {
                     keyword: r.palabraClave,
@@ -132,6 +125,7 @@ export async function GET(req: NextRequest) {
                     position: r.posicion,
                     change24h,
                     change7d,
+                    change30d,
                     searchEngine: r.buscador,
                     device: r.dispositivo,
                     location: r.location
@@ -143,6 +137,7 @@ export async function GET(req: NextRequest) {
                     position: r.posicion,
                     change24h: '—',
                     change7d: '—',
+                    change30d: '—',
                     searchEngine: r.buscador,
                     device: r.dispositivo,
                     location: r.location
@@ -150,15 +145,12 @@ export async function GET(req: NextRequest) {
             }
         });
 
-        console.log("[API stats-detailed] Resultados finales calculados:", detailedResults.length);
-        console.log("[API stats-detailed] Ejemplo de resultado final:", detailedResults[0]); // Solo el primero para no saturar
-
         return NextResponse.json({
             success: true,
             results: detailedResults
         });
     } catch (err) {
-        console.error('[API stats-detailed] Error interno:', err);
-        return NextResponse.json({ success: false, message: 'Error interno.' }, { status: 500 });
+        console.error('[API stats-detailed] Internal error:', err);
+        return NextResponse.json({ success: false, message: 'Internal error.' }, { status: 500 });
     }
 }

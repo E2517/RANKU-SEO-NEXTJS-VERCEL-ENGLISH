@@ -50,8 +50,6 @@ export default function StatsSection() {
                 if (domain || keyword) {
                     loadDetailedStats(domain, keyword);
                 }
-            } else {
-                console.error('Error loading stats:', data.message);
             }
         } catch (err) {
             console.error('Error loading stats:', err);
@@ -72,8 +70,6 @@ export default function StatsSection() {
             const data = await res.json();
             if (data.success) {
                 setDetailedStats(data.results || []);
-            } else {
-                console.error('Error loading detailed stats:', data.message);
             }
         } catch (err) {
             console.error('Error loading detailed stats:', err);
@@ -147,7 +143,7 @@ export default function StatsSection() {
             window.URL.revokeObjectURL(downloadUrl);
         } catch (err) {
             console.error('Error downloading Excel:', err);
-            showToast.error('Network error while generating report.', {
+            showToast.error('Network error while generating the report.', {
                 duration: 4000,
                 position: 'top-center',
                 transition: 'topBounce',
@@ -195,7 +191,7 @@ export default function StatsSection() {
                 const errorText = await response.text();
                 try {
                     const errorJson = JSON.parse(errorText);
-                    showToast.error('Error: ' + (errorJson.message || 'Could not generate PDF report.'), {
+                    showToast.error('Error: ' + (errorJson.message || 'Could not generate the PDF report.'), {
                         duration: 4000,
                         position: 'top-center',
                         transition: 'topBounce',
@@ -233,13 +229,19 @@ export default function StatsSection() {
             window.URL.revokeObjectURL(downloadUrl);
         } catch (err) {
             console.error('Error downloading PDF:', err);
-            showToast.error('Network error while generating PDF report.', {
+            showToast.error('Network error while generating the PDF report.', {
                 duration: 4000,
                 position: 'top-center',
                 transition: 'topBounce',
                 sound: true,
             });
         }
+    };
+
+    const getTrendColor = (change: string) => {
+        if (change.includes('▲')) return 'green';
+        if (change.includes('▼')) return 'red';
+        return 'gray';
     };
 
     if (loading) {
@@ -358,6 +360,7 @@ export default function StatsSection() {
                             <th>Current Position</th>
                             <th>24h</th>
                             <th>7d</th>
+                            <th>30d</th>
                             <th>Search Engine</th>
                             <th>Device</th>
                             <th>Location</th>
@@ -369,8 +372,9 @@ export default function StatsSection() {
                                 <td>{row.keyword}</td>
                                 <td>{row.domain}</td>
                                 <td>{row.position}</td>
-                                <td>{row.change24h}</td>
-                                <td>{row.change7d}</td>
+                                <td style={{ color: getTrendColor(row.change24h) }}>{row.change24h}</td>
+                                <td style={{ color: getTrendColor(row.change7d) }}>{row.change7d}</td>
+                                <td style={{ color: getTrendColor(row.change30d) }}>{row.change30d}</td>
                                 <td>{row.searchEngine}</td>
                                 <td>{row.device}</td>
                                 <td>{row.location}</td>
