@@ -7,6 +7,7 @@ import axios from 'axios';
 import { cookies } from 'next/headers';
 
 const SERPAPI_API_KEY = process.env.SERPAPI_API_KEY;
+const CRON_SECRET = process.env.CRON_SECRET;
 
 interface SerpApiResponse {
     organic_results?: {
@@ -57,23 +58,35 @@ interface SearchResultDocument {
     updatedAt?: Date;
 }
 
-export async function GET() {
+export async function GET(request: Request) {
+    const url = new URL(request.url);
     const cookieStore = await cookies();
-    const userId = cookieStore.get('user_id')?.value;
+    const userIdFromCookie = cookieStore.get('user_id')?.value;
+    const tokenFromQuery = url.searchParams.get('token');
 
-    if (!userId) {
-        return NextResponse.json({ success: false, message: 'Not authenticated.' }, { status: 401 });
+    let isAuthorized = false;
+
+    if (!userIdFromCookie && CRON_SECRET && tokenFromQuery === CRON_SECRET) {
+        isAuthorized = true;
+    } else if (userIdFromCookie) {
+        await connectDB();
+        const user = await User.findById(userIdFromCookie);
+        if (user && user.role === 'admin') {
+            isAuthorized = true;
+        }
     }
 
-    await connectDB();
+    if (!isAuthorized) {
+        return NextResponse.json({ success: false, message: 'No autorizado.' }, { status: 401 });
+    }
 
-    const user = await User.findById(userId);
-    if (!user || user.role !== 'admin') {
-        return NextResponse.json({ success: false, message: 'Access denied.' }, { status: 403 });
+    const mongooseGlobal: any = global;
+    if (!userIdFromCookie || !mongooseGlobal.mongoose) {
+        await connectDB();
     }
 
     if (!SERPAPI_API_KEY) {
-        return NextResponse.json({ success: false, message: 'SerpAPI not configured.' }, { status: 500 });
+        return NextResponse.json({ success: false, message: 'SerpAPI no configurada.' }, { status: 500 });
     }
 
     try {
@@ -98,7 +111,7 @@ export async function GET() {
         ]);
 
         if (allKeywords.length === 0) {
-            return NextResponse.json({ success: true, message: 'No keywords to update.', updated: 0 });
+            return NextResponse.json({ success: true, message: 'No hay keywords para actualizar.', updated: 0 });
         }
 
         let updatedCount = 0;
@@ -128,7 +141,7 @@ export async function GET() {
                     };
 
                     try {
-                        const response = await axios.get<SerpApiResponse>('https://serpapi.com/search  ', { params });
+                        const response = await axios.get<SerpApiResponse>('https://serpapi.com/search', { params });
                         const pageResults = response.data.local_results || response.data.ads_results || [];
                         if (pageResults.length === 0) break;
 
@@ -170,7 +183,7 @@ export async function GET() {
                         if (foundInPage) break;
                     } catch (error: any) {
                         if (error.response?.status === 400 && typeof error.response.data?.error === 'string' && error.response.data.error.includes('location')) {
-                            console.warn(`Skipping keyword due to location error: ${palabraClave} - ${location}`);
+                            console.warn(`Saltando keyword por error de localización: ${palabraClave} - ${location}`);
                             break;
                         }
                         throw error;
@@ -192,7 +205,7 @@ export async function GET() {
                     };
 
                     try {
-                        const response = await axios.get<SerpApiResponse>('https://serpapi.com/search  ', { params });
+                        const response = await axios.get<SerpApiResponse>('https://serpapi.com/search', { params });
                         const organic = response.data.organic_results || [];
                         if (organic.length === 0) break;
 
@@ -213,7 +226,7 @@ export async function GET() {
                         if (foundInPage) break;
                     } catch (error: any) {
                         if (error.response?.status === 400 && typeof error.response.data?.error === 'string' && error.response.data.error.includes('location')) {
-                            console.warn(`Skipping keyword due to location error: ${palabraClave} - ${location}`);
+                            console.warn(`Saltando keyword por error de localización: ${palabraClave} - ${location}`);
                             break;
                         }
                         throw error;
@@ -282,9 +295,9 @@ export async function GET() {
             }
         }
 
-        return NextResponse.json({ success: true, message: 'Keywords updated.', updated: updatedCount });
+        return NextResponse.json({ success: true, message: 'Keywords udapted.', updated: updatedCount });
     } catch (error: any) {
-        console.error('Error updating keywords:', error.response?.data || error.message || error);
-        return NextResponse.json({ success: false, message: 'Error updating keywords.' }, { status: 500 });
+        console.error('Error actualizando keywords:', error.response?.data || error.message || error);
+        return NextResponse.json({ success: false, message: 'Error al actualizar las keywords.' }, { status: 500 });
     }
 }

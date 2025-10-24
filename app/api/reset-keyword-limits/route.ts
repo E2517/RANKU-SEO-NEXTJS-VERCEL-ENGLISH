@@ -4,20 +4,33 @@ import { connectDB } from '@/lib/mongoose';
 import { getKeywordLimit } from '@/lib/utils';
 import { cookies } from 'next/headers';
 
-// Set up a daily cron job (e.g., with Vercel Cron, Railway, or a server) that calls GET /api/reset-keyword-limits
-export async function GET() {
-    const cookieStore = await cookies();
-    const userId = cookieStore.get('user_id')?.value;
+const CRON_SECRET = process.env.CRON_SECRET;
 
-    if (!userId) {
-        return NextResponse.json({ success: false, message: 'Not authenticated.' }, { status: 401 });
+export async function GET(request: Request) {
+    const url = new URL(request.url);
+    const cookieStore = await cookies();
+    const userIdFromCookie = cookieStore.get('user_id')?.value;
+    const tokenFromQuery = url.searchParams.get('token');
+
+    let isAuthorized = false;
+
+    if (!userIdFromCookie && CRON_SECRET && tokenFromQuery === CRON_SECRET) {
+        isAuthorized = true;
+    } else if (userIdFromCookie) {
+        await connectDB();
+        const user = await User.findById(userIdFromCookie);
+        if (user && user.role === 'admin') {
+            isAuthorized = true;
+        }
     }
 
-    await connectDB();
+    if (!isAuthorized) {
+        return NextResponse.json({ success: false, message: 'No autorizado.' }, { status: 401 });
+    }
 
-    const user = await User.findById(userId);
-    if (!user || user.role !== 'admin') {
-        return NextResponse.json({ success: false, message: 'Access denied.' }, { status: 403 });
+    const mongooseGlobal: any = global;
+    if (!userIdFromCookie || !mongooseGlobal.mongoose) {
+        await connectDB();
     }
 
     const today = new Date();
