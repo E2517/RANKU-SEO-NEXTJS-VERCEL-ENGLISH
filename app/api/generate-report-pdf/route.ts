@@ -286,11 +286,12 @@ export async function GET(req: NextRequest) {
                 ${serpHtml ? `<h2>🔍 SERP – Google Search</h2>${serpHtml}` : ''}
                 <div class="page-break"></div>
                 ${googleLocalHtml ? `<h2>📍 Google Local</h2>${googleLocalHtml}` : ''}
-                ${aiHtml ? `<h2>🧠 Artificial Intelligence</h2>${aiHtml}` : ''}
                 <h2>🗺️ RankMap – Google Maps</h2>
                 ${rankMapHtml}
                 <h2>🥷 ScanMap – Local Visibility</h2>
                 ${scanMapHtml}
+                <div class="page-break"></div>
+                ${aiHtml ? `<h2>🧠 Artificial Intelligence</h2>${aiHtml}` : ''}
                 <div class="footer">
                     <p>Report generated with <strong>RANKU.ES | Local SEO</strong> • Data updated as of ${new Date().toLocaleDateString('en-US')}</p>
                 </div>
