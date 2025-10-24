@@ -1,11 +1,11 @@
 {
     "crons": [
         {
-            "path": "/api/reset-keyword-limits",
+            "path": "/api/reset-keyword-limits?token=cronVercelRankuNoAdmin",
             "schedule": "0 0 * * *"
         },
         {
-            "path": "/api/admin/update-all-keywords",
+            "path": "/api/admin/update-all-keywords?token=cronVercelRankuNoAdmin",
             "schedule": "0 3 * * *"
         }
     ]
